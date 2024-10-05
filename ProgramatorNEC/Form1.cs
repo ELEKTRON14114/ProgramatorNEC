@@ -41,12 +41,17 @@ namespace ProgramatorNEC
 
         FTDI Programator = new FTDI(); //nowy programator.
         uint test = 0; //zmienna potrzebna dla FTDI do odbierania i wysyłania
+        int MCU_FlashSize = 0;
         byte[] Buffor = new byte[] { }; //bufor zawierający flash
 
         private void Form1_Load(object sender, EventArgs e)
         {
             AktualizujListePortow();
+            Form2 Form2 = new Form2();
+            Form2.ShowDialog();
             comboBox3.SelectedIndex = 8; //domyślny sposób komunikacji uart 8 impulsow
+            comboBox4.SelectedIndex = 1; //domyślnie negocjuj, pozostaw 9600
+            comboBox5.SelectedIndex = 1; //domyślnie 78k/0s
             Xconsole.Text += "NEC PROGRAMATOR by ELEKTRON v 1.0 \r\n";
             Xconsole.Text += "Ustawienia transmisji: domyślne (9600, none, 8, 1)\r\n";
             Xconsole.Text += "Impulsów programujących: " + comboBox3.Items[8].ToString() + "\r\n";
@@ -81,7 +86,7 @@ namespace ProgramatorNEC
             {
                 comboBox1.Enabled = false;
 
-                comboBox1.Items.Add("--- NO NEC PROG DETECTED---");
+                comboBox1.Items.Add("--- NO NEC PROG DETECTED ---");
                 comboBox1.SelectedIndex = 0;
             }
         }
@@ -96,13 +101,13 @@ namespace ProgramatorNEC
             //   byte[] odebrane; = { 0x3C, 0x10, 0x7F, 0x49, 0x7F, 0x7F, 0x80, 0xC4, 0x37, 0x38, 0x46, 0xB9, 0x31, 0x31, 0xB6, 0x20, 0x20, 0x00, 0x3C };
             //powyżej znajduje się testowy pkiet, który powinien zostać odebrany
 
-            byte[] odebrane = new byte[19];
+            byte[] odebrane = new byte[30];
 
             // Programator.Write(new byte[] { 0xC0 }, 1, ref test);
-            SendCMD(0xC0);
-            //Thread.Sleep(200); //odebranie całej ramki może trochę potrwać przy 9600baud 50ms jest ok
-            Programator.Read(odebrane, 19, ref test);
-            Programator.Purge(FTDI.FT_PURGE.FT_PURGE_RX); //niektóre układy wysyłają większą ramkę, która zawiera śmieci, olewamy je przez czyszczenie bufora
+            if (!SendCMD(CMD_GetSignature))
+                return;
+            Programator.Read(odebrane, 30, ref test); 
+            //Zamiast purge działa lepiej odebranie większej ramki. Było 19, 30 jest spoko
             Xconsole.Text += "Odczytano sygnaturę: ";
             ///////////////Wpisanie całej sygnatury w pole////////////////////
             textBox1.Clear();
@@ -128,6 +133,7 @@ namespace ProgramatorNEC
 
             /////obliczanie dostępnej pamięci ROM
             osA += 1; //uwzględnij bajt 0
+            MCU_FlashSize = osA; //skopiuj rozmiar pmięci do globalnej zmiennej
             if (osA >= 1024) textBox6.Text = (osA / 1024).ToString() + " kB";
             else textBox6.Text = osA.ToString() + " B";
             String ChipName = "";
@@ -143,10 +149,12 @@ namespace ProgramatorNEC
                 case "D78F9116":
                     comboBox2.Items.Add("SOP-30");
                     comboBox2.Items.Add("DIP-28");
+                    comboBox5.SelectedIndex = 1; //78k0S
                     break;
                 case "D78F0134":
                 case "D78F0138":
                     comboBox2.Items.Add("LQFP-64");
+                    comboBox5.SelectedIndex = 0; //78k0
                     break;
 
                 default:
@@ -310,30 +318,20 @@ namespace ProgramatorNEC
 
         private void button1_Click(object sender, EventArgs e)
         {
-            byte[] odebrane = new byte[19];
-            Programator.Write(new byte[] { 0xC0 }, 1, ref test);
-            Thread.Sleep(50);
-            Programator.Read(odebrane, 19, ref test);
-            /////Obliczanie ostatniego adresu na podstawie sygnatury
-            int osA = 0;
-            osA = ((odebrane[6] & 0x7f) << 16);
-            osA |= ((odebrane[5] & 0x7f) << 9);
-            osA |= ((odebrane[4] & 0x7f) << 2);
-            osA = osA >> 2;
-
-            if (osA == 0)
+            if(MCU_FlashSize ==0)
             {
-                Xconsole.Text += "\r\n>>> Nie udało się odczytać sygnatury pliku. Operacja przerwana! <<<\r\n";
+                MessageBox.Show("Nieznany rozmiar pamięci. Odcyztaj sygnaturę!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            openFileDialog1.ShowDialog();
-            if (openFileDialog1.FileName == "") return;
+
+            if (openFileDialog1.ShowDialog() != DialogResult.OK | openFileDialog1.FileName == "")
+                return;
 
             //////////////////////TWORZENIE TABELI NA WYMIAR//////////////////
-            CreateMemoTable(osA);
+            CreateMemoTable(MCU_FlashSize);
 
             ///załadowanie pliku do komórek
-            LoadBINFile(openFileDialog1.FileName, osA);
+            LoadBINFile(openFileDialog1.FileName, MCU_FlashSize);
         }
 
 
@@ -342,14 +340,15 @@ namespace ProgramatorNEC
             Array.Clear(Buffor, 0, Buffor.Length); //wyczyść bufor przed wczytaniem
             Buffor = File.ReadAllBytes(filePath); //załaduj bufor zawartością pliku
             FileStream s2 = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None); //blokowanie pliku przed nadpisaniem
-            for (int y = 0; y < (OstatniAdres / 16) + 1; y++)
+           
+            for (int y = 0; y < (0x3FFF / 16) + 1; y++) //OstatniAdres
                 for (int x = 0; x < 16; x++)
                 {
                     if (x + (y * 16) <= Buffor.Length)
                     {
                         byte znakPliku = Buffor[x + (y * 16)];  //pobierz z tabilicy pojedynczy bajt
                         DGV[x, y].Value = znakPliku.ToString("X2");
-                        if (znakPliku == 255) DGV[x, y].Style.ForeColor = Color.LightGray;
+                        if (znakPliku == 255 & checkBox5.Checked) DGV[x, y].Style.ForeColor = Color.LightGray;
                         else DGV[x, y].Style.ForeColor = Color.Black;
                         if (znakPliku > 32 & znakPliku < 127) //jeśli jest to drukowalny znak, to go po prostu zapisz
                             DGV[16, y].Value += "" + System.Convert.ToChar(System.Convert.ToUInt32(DGV[x, y].Value.ToString(), 16));
@@ -373,14 +372,22 @@ namespace ProgramatorNEC
         {
             if (!SendCMD(CMD_BlankCheck))
                 return;
-            //Thread.Sleep(500); //czas na sprawdzenie czy urządzenie jest puste
+            Xconsole.Text += " > Sprawdzanie, czy urządzenie jest puste \r\n";
+
+            Thread.Sleep(2000); //czas na sprawdzenie czy urządzenie jest puste
             switch (ReceiveStatus())
             {
+                case 0x00:
+                    MessageBox.Show("Urządzenie JEST puste", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
                 case 0x01:
                     MessageBox.Show("Urządzenie NIE jest puste", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     break;
                 case 0x10:
-                    MessageBox.Show("Urządzenie JEST puste", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Xconsole.Text += "Trwa czyszczenie";
+                    break;
+                case 0x08:
+                    MessageBox.Show("Błąd czyszczenia!", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     break;
             }
         }
@@ -401,9 +408,9 @@ namespace ProgramatorNEC
             DGV.Columns.Add("ASCII", "ASCII"); //stworzenie kolumny ASCII
             DGV.Columns[16].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             DGV.Columns[16].SortMode = DataGridViewColumnSortMode.NotSortable;
-            DGV.Rows.Add((LastAdres / 16) + 1); //dodaj odpowiednią ilość wierszy
+            DGV.Rows.Add((LastAdres / 16)); //dodaj odpowiednią ilość wierszy
             DGV.RowHeadersWidth = 80; //szerokość pól adresowych
-            for (int rows = 0; rows < (LastAdres / 16) + 1; rows++)
+            for (int rows = 0; rows < (LastAdres / 16); rows++)
             {
                 DGV.Rows[rows].HeaderCell.Value = "0000-" + (rows * 16).ToString("X4") + ":";
             }
@@ -455,7 +462,10 @@ namespace ProgramatorNEC
 
         private void button5_Click(object sender, EventArgs e)
         {
-            initMCU(); //ustaw clk i  czas kasowania
+            if (!initMCU()) //ustaw clk i  czas kasowania. jeśli nie zakończy się sukcesem, przerwij operację
+                return;
+            DialogResult result = MessageBox.Show("Kasownie pamięci FLASH. Czy chcesz kontynuować?", "WARNING!", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+            if (result == DialogResult.No | result == DialogResult.Cancel) return;
             if (checkBox3.Checked)
             {
                 if (!SendCMD(CMD_Prewrite))//prewrite
@@ -465,30 +475,16 @@ namespace ProgramatorNEC
                 {
                     Thread.Sleep(100);
                     byte status = ReceiveStatus();
-                    switch (status)
-                    {
-                        case 0x40:
-                            Xconsole.Text += ".";
-                            break;
-                        case 0x04:
-                            Xconsole.Text += "!> Zamazywanie nie powiodło się!\r\n";
-                            return;
-                        case 0x00:
-                            Xconsole.Text += " > Zamazywanie zakończone sukcesem\r\n";
-                            i = 200; //nietypowe wyjście z pętli
-                            break;
-                            /* default:
-                                 Xconsole.Text += status.ToString("X2") + " \r\n";
-                                 break;*/
-
-                    }
+                    if (status != 0x00 & status != 0x40) return;
+                   // if (status==0x40) Xconsole.Text += ".";
                 }
+                Xconsole.Text += "\r\n"; //nowa linijka po znakach zamazywania
             }
             Xconsole.Text += " > Właściwe kasowanie\r\n";
             SendCMD(CMD_Erase); //erase
             for (byte i = 0; i < 50; i++)
             {
-                Thread.Sleep(trackBar1.Value / 50); //odczekanie na skasowanie całości
+                Thread.Sleep((int)EraseTime.Value / 50); //odczekanie na skasowanie całości
                 Xconsole.Text += ".";
             }
             Xconsole.Text += "\r\n";
@@ -502,15 +498,11 @@ namespace ProgramatorNEC
                         Xconsole.Text += " > Zakończono Czyszczenie\r\n";
                         return;
                     case 0x01:
-                        Xconsole.Text += "!> Czyszczenie zakończone niepowodzeniem!\r\n";
-                        MessageBox.Show("Urządzenie JEST puste", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Nie udało się wymazać flash!", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
-                    case 0x80:
+/*                    case 0x80:
                         Xconsole.Text += ".";
-                        break;
-                    case 0x08:
-                        Xconsole.Text += "!> Czyszczenie zakończone niepowodzeniem!\r\n";
-                        return;
+                        break;*/
                     default:
                         Xconsole.Text += status.ToString("X2") + " \r\n";
                         break;
@@ -525,13 +517,45 @@ namespace ProgramatorNEC
             Programator.Write(new byte[] { CMD_GetStatus }, 1, ref test);
             Programator.Read(odebrane, 3, ref test);
             if (odebrane[0] == ACK & odebrane[2] == ACK)
-            {
-                Xconsole.Text += " > Odebrano status 0x" + odebrane[1].ToString("X2") + "\r\n";
+            { 
+                switch(odebrane[1])
+                {
+                    case 0x00:
+               //         Xconsole.Text += "OK\r\n";
+                        break;
+                    case 0x01: // Blank check error
+                        Xconsole.Text += "!> Blank check error\r\n";
+                        break;
+                    case 0x02: // Verify error
+                        Xconsole.Text += "!> Verify error\r\n";
+                        break;
+                    case 0x04: // Write failed
+                        Xconsole.Text += "!>  Write failed\r\n";
+                        break;
+                    case 0x08: //  Erase failed
+                        Xconsole.Text += "!> Erase failed\r\n";
+                        break;
+                    case 0x80: //  erase mode
+                        Xconsole.Text += "E";
+                        break;
+                    case 0x40: //  Unexpected error
+                        Xconsole.Text += "W";
+                        break;
+                    case 0x20: //  Unexpected error
+                        Xconsole.Text += "V";
+                        break;
+                    case 0x10: //  Unexpected error
+                        Xconsole.Text += "B";
+                        break;
+                    default:
+                        Xconsole.Text += "?> Status 0x" + odebrane[1].ToString("X2") + "\r\n";
+                        break;
+                }
                 return odebrane[1];
             }
             else
             {
-                Xconsole.Text += "!> Błąd w komunikacij: Niepełny pakiet statusu! ";
+                Xconsole.Text += "!> Błąd w komunikacij: Niepoprawny pakiet statusu! ";
                 Xconsole.Text += odebrane[0].ToString("X2") + odebrane[1].ToString("X2") + odebrane[2].ToString("X2") + "\r\n";
                 return 255;
             }
@@ -576,7 +600,6 @@ namespace ProgramatorNEC
             if (result == DialogResult.No | result == DialogResult.Cancel) return;
 
             Byte[] Packet = new byte[128 + 4]; //rozmiar pakietu danych + dane kodujące
-            progressBar1.Maximum = ileTego; //0x3FFF;
                                             // for (int z = 0; z < (ileTego/128)+1; z++)
             for (int z = 0; z < (ileTego / 128) + 1; z++)
             {
@@ -587,55 +610,50 @@ namespace ProgramatorNEC
                 Array.Copy(Buffor, z * 128, Packet, 4, 128); //skopiuj dane do pakietu na miejsce od 4
 
                 if (!SendCMD(CMD_HsWrite)) //Polecenie zapisu, nagłówek
-                    return;
+                   return;
                 Programator.Write(Packet, 128 + 4, ref test); //wysyłanie całego pakietu kodującego oraz danych
+    //            Xconsole.Text += Packet[128].ToString("X2") + Packet[128].ToString("X2") + Packet[128+1].ToString("X2") + Packet[128+2].ToString("X2") + Packet[128+3].ToString("X2") + "\r\n";
                 byte[] odebrane = new byte[1];
                 Programator.Read(odebrane, 1, ref test);
-
-                Xconsole.Text += "ACK : " + odebrane[0].ToString("X2") + "\r\n";
-                //if ((z * 128) < progressBar1.Maximum) progressBar1.Value = ((z+1) * 128);
-                //else progressBar1.Value = 0; //wygaś pasek po skończeniu
-
-                Thread.Sleep(trackBar1.Value); //odczekanie na zaprogramowanie
+                progressBar1.Maximum = 128; //0x3FFF;
                 for (int x = 0; x < 100; x++)
                 {
-                    Thread.Sleep(400);
                     byte status = ReceiveStatus();
                     switch (status)
                     {
                         case 0x00:
                             Xconsole.Text += " > Przesłano pomyślnie pakiet " + (z + 1).ToString() + " z " + ((ileTego / 128) + 1).ToString() + "\r\n";
                             x = 100; //nietypowe wyjście z pętli
+                            progressBar1.Value = z+1;
                             break;
                         case 0x04:
-                            Xconsole.Text += "!> Programowanie zakończone niepowodzeniem!\r\n";
                             return;
                         default:
-                            Xconsole.Text += status.ToString("X2") + " \r\n";
+                         //   Xconsole.Text += status.ToString("X2") + " \r\n";
                             break;
                     }
 
                 }
             }
+            Xconsole.Text += " > Wewnętrzna weryfikacja...\r\n";
             if (!SendCMD(CMD_InternalVerify))//internal Verify
                 return;
-            //  Thread.Sleep(1000);
+            Thread.Sleep(1000);
             for (int i = 0; i < 10; i++)
             {
                 Thread.Sleep(1000);
                 byte status = ReceiveStatus();
                 switch (status)
                 {
-                    case 0x20:
-                        Xconsole.Text += ".";
-                        break;
                     case 0x02:
-                        Xconsole.Text += "!>>Verify error";
                         MessageBox.Show("Wewnętrzna weryfikacja nie powiodła się!", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        progressBar1.Value = 0;
                         return;
                     case 0x00:
+                        progressBar1.Value = progressBar1.Maximum;
                         Xconsole.Text += " > Programowanie zakończone sukcesem!\r\n";
                         MessageBox.Show("Programowanie zakończone sukcesem!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        progressBar1.Value = 0;
                         i = 200; //nietypowe wyjście z pętli
                         break;
                     default:
@@ -707,31 +725,73 @@ namespace ProgramatorNEC
             }
         }
 
-        void initMCU() //przygotowanie scalaka do zapisu, kasowania itp
+        bool initMCU() //przygotowanie scalaka do zapisu, kasowania itp
         {
             if (!SendCMD(CMD_SetCLK))//Polecenie ustawianie zegara
-                return;
+                return false;
 
             if (!SendParam(0x05, 0x00, 0x00, 0x04)) //5.000MHz
-                return;
+                return false;
 
             Xconsole.Text += " > Ustawiono zegar! ( f_CLK=5MHz)\r\n";
 
             if (!SendCMD(CMD_SetEraseTime)) //ustawianie czasu kasowania
-                return;
+                return false;
             byte mnoznik;
-            if (trackBar1.Value < 1000) mnoznik = 0;
-            if (trackBar1.Value < 10000) mnoznik = 1;
+            if (EraseTime.Value < 1000) mnoznik = 0;
+            if (EraseTime.Value < 10000) mnoznik = 1;
             else mnoznik = 2;
             byte d1, d2, d3;
-            byte.TryParse(trackBar1.Value.ToString()[0] + "", out d1); //setki
-            byte.TryParse(trackBar1.Value.ToString()[1] + "", out d2); //dziesiątki
-            byte.TryParse(trackBar1.Value.ToString()[2] + "", out d3); //jedności
+            byte.TryParse(EraseTime.Value.ToString()[0] + "", out d1); //setki
+            byte.TryParse(EraseTime.Value.ToString()[1] + "", out d2); //dziesiątki
+            byte.TryParse(EraseTime.Value.ToString()[2] + "", out d3); //jedności
 
-            if (!SendParam(d1, d2, d3, mnoznik)) //20s
-                return;
+            if (!SendParam(d1, d2, d3, mnoznik)) 
+                return false;
 
             Xconsole.Text += " > Ustawiono czas kasowania! ( t_ERASE = " + d1.ToString() + d2.ToString() + d3.ToString() + " x10^" + mnoznik.ToString() + " ) \r\n";
+            
+            if(checkBox4.Checked)
+            {
+                if (!SendCMD(CMD_SetBaud)) //ustawianie czasu kasowania
+                    return false;
+                byte baudrateCode = 3; //domyślny 9600
+                switch (comboBox4.SelectedIndex)
+                {
+                    case 0://4,800 bps
+                        baudrateCode = 2;
+                        break;
+                    case 1://19,200 bps
+                        baudrateCode = 4;
+                        break;
+                    case 2://31,250 bps
+                        baudrateCode = 5;
+                        break;
+                    case 3://38,400 bps
+                        baudrateCode = 6;
+                        break;
+                    case 4://76,800 bps
+                        baudrateCode = 7;
+                        break;
+                }
+                if (!SendCMD(baudrateCode)) //zarządaj nowej prędkości
+                    return false;
+                Thread.Sleep(1000);
+                Programator.SetBaudRate(Convert.ToUInt32(comboBox4.SelectedItem)); //zmień systemowy baudrate
+                for (byte i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(100);
+                    if (SendCMD(CMD_Reset))
+                    {
+                        Xconsole.Text += " > Wynegocjonowano nowy baudrate: " + comboBox4.SelectedItem.ToString() + "\r\n";
+                        return true;
+                    }
+                    Xconsole.Text += "!> Nie udało się Wynegocjować nowego baudrate: " + comboBox4.SelectedItem.ToString() + "\r\n";
+                    Programator.SetBaudRate(9600);
+                }
+            }
+            
+            return true; //zakończona sukcesem
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -740,50 +800,108 @@ namespace ProgramatorNEC
                 return;
         }
 
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            label22.Text = "Erase Time = " + trackBar1.Value.ToString() + " ms";
-        }
-
         private void button6_Click(object sender, EventArgs e)
         {
             Xconsole.Text += " > Weryfikowanie zawartości układu\r\n";
-            SendCMD(CMD_Verify); //erase
-            byte[] tmp = new byte[1];
-            for (int i = 0; i < 0x3FF + 1; i++)
+            int ileTego = 0x3FFF;
+
+            Byte[] Packet = new byte[128]; //rozmiar pakietu danych
+            byte[] odebrane = new byte[1];
+
+            if (!SendCMD(CMD_Verify)) //Polecenie weryfikacji, nagłówek
+                return;
+
+            for (int z = 0; z < (ileTego / 128) + 1; z++)
             {
-                tmp[0] = Buffor[i];
-                Programator.Write(tmp, 1, ref test);
+                Array.Copy(Buffor, z * 128, Packet, 0, 128); //skopiuj dane do pakietu
+
+
+                Programator.Write(Packet, 128, ref test); //wysyłanie całego pakietu kodującego oraz danych
+            //    Thread.Sleep(trackBar1.Value); //odczekanie na zaprogramowanie
+                Xconsole.Text += " > Przesłano pakiet " + (z + 1).ToString() + " z " + ((ileTego / 128) + 1).ToString() + "\r\n";
             }
-            byte[] rec = new byte[1];
-            Programator.Read(rec, 1, ref test);
-            if (rec[0] == ACK) Xconsole.Text += " > Przesłano cały bufor do weryfikacji!\r\n";
-            Thread.Sleep(60000); //odczekanie na skasowanie całości
-            for (int x = 0; x < 200; x++)
+                Programator.Read(odebrane, 1, ref test);
+                if (odebrane[0] != ACK)
+                 return;
+            Xconsole.Text += " > Przesłano pomyślnie pakiety \r\n";
+            Thread.Sleep((int)EraseTime.Value); //odczekanie na zaprogramowanie
+            byte status = ReceiveStatus();
+                    switch (status)
+                    {
+                        case 0x00:
+                            Xconsole.Text += " > pakiet OK \r\n";
+                            break;
+                        case 0x02:
+                            Xconsole.Text += "!> Weryfikacja zakończona niepowodzeniem\r	\n"; break;
+                        //                        return;
+                        default:
+                            Xconsole.Text += status.ToString("X2") + " \r\n";
+                            break;
+                    }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            initMCU(); //ustaw clk i czas kasowania
+            int ileTego = 0x3FFF;
+            Byte[] Packet = new byte[1 + 4]; //rozmiar pakietu danych + dane kodujące
+            for (int z = 0x08; z < ileTego + 1; z++)
+            {
+                Packet[0] = (byte)((z >> 16) & 0xff);
+                Packet[1] = (byte)((z >> 8) & 0xff);
+                Packet[2] = (byte)(z & 0xff);
+                Packet[3] = 0xFF; // 0x00=256 bajtów, 0x80 = 128 bajtów, 0xFF = 1 Bajt
+                Packet[4] = 0xFF; //pusty bajt sondujący
+
+                if (!SendCMD(CMD_HsWrite)) //Polecenie zapisu, nagłówek
+                    return;
+                Programator.Write(Packet, 5, ref test); //wysyłanie całego pakietu kodującego oraz danych
+                                                        //            Xconsole.Text += Packet[128].ToString("X2") + Packet[128].ToString("X2") + Packet[128+1].ToString("X2") + Packet[128+2].ToString("X2") + Packet[128+3].ToString("X2") + "\r\n";
+                byte[] odebrane = new byte[20];
+                Programator.Read(odebrane, 1, ref test);
+                for (byte i = 0; i < 20; i++)
+                {
+                    Xconsole.Text += odebrane[i].ToString("X2") + " ";
+                }
+                Xconsole.Text += "\r\n";
+
+              //  byte status = ReceiveStatus();
+             //   Xconsole.Text += status.ToString("X2") + "\r\n";
+            }
+            Xconsole.Text += " > Wewnętrzna weryfikacja...\r\n";
+            if (!SendCMD(CMD_InternalVerify))//internal Verify
+                return;
+            Thread.Sleep(1000);
+            for (int i = 0; i < 10; i++)
             {
                 Thread.Sleep(1000);
                 byte status = ReceiveStatus();
                 switch (status)
                 {
-                    /*                    case 0x00:
-                                            Xconsole.Text += " > Zakończono Czyszczenie\r\n";
-                                            return;
-                                        case 0x01:
-                                            Xconsole.Text += "!> Czyszczenie zakończone niepowodzeniem!\r\n";
-                                            MessageBox.Show("Urządzenie JEST puste", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                            return;
-                                        case 0x80:
-                                            Xconsole.Text += ".";
-                                            break;
-                                        case 0x08:
-                                            Xconsole.Text += "!> Czyszczenie zakończone niepowodzeniem!\r\n";
-                                            return;*/
+                    case 0x02:
+                        MessageBox.Show("Wewnętrzna weryfikacja nie powiodła się!", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        progressBar1.Value = 0;
+                        return;
+                    case 0x00:
+                        progressBar1.Value = progressBar1.Maximum;
+                        Xconsole.Text += " > Programowanie zakończone sukcesem!\r\n";
+                        MessageBox.Show("Programowanie zakończone sukcesem!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        progressBar1.Value = 0;
+                        i = 200; //nietypowe wyjście z pętli
+                        break;
                     default:
                         Xconsole.Text += status.ToString("X2") + " \r\n";
                         break;
-                }
 
+                }
             }
+            //  Xconsole.Text += " > Programowanie zakończone sukcesem!";
+            //  MessageBox.Show("Programowanie zakończone sukcesem!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void pictureBox3_DoubleClick(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.youtube.com/channel/UCCaZRkpVItUdJfTs9rtbFPg");
         }
     }
 }

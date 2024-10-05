@@ -31,15 +31,24 @@ namespace ProgramatorNEC
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.comboBox5 = new System.Windows.Forms.ComboBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.label27 = new System.Windows.Forms.Label();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
+            this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label23 = new System.Windows.Forms.Label();
+            this.EraseTime = new System.Windows.Forms.NumericUpDown();
             this.label22 = new System.Windows.Forms.Label();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox5 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label21 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
@@ -75,14 +84,15 @@ namespace ProgramatorNEC
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.button12 = new System.Windows.Forms.Button();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
             this.DGV = new System.Windows.Forms.DataGridView();
+            this.button5 = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.button11 = new System.Windows.Forms.Button();
@@ -113,11 +123,11 @@ namespace ProgramatorNEC
             this.wklejToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.EraseTime)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.tabPage2.SuspendLayout();
-            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DGV)).BeginInit();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -132,13 +142,21 @@ namespace ProgramatorNEC
             this.imageList1.TransparentColor = System.Drawing.Color.White;
             this.imageList1.Images.SetKeyName(0, "SOP30-pinoutNEC(MINI)2.png");
             this.imageList1.Images.SetKeyName(1, "DIP28-pinoutNEC(MINI)2.png");
-            this.imageList1.Images.SetKeyName(2, "DIP28-pinoutNEC(MINI)2.png");
+            this.imageList1.Images.SetKeyName(2, "LQFP-64.png");
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.checkBox3);
+            this.tabPage1.Controls.Add(this.comboBox5);
+            this.tabPage1.Controls.Add(this.label24);
+            this.tabPage1.Controls.Add(this.checkBox4);
+            this.tabPage1.Controls.Add(this.label27);
+            this.tabPage1.Controls.Add(this.label26);
+            this.tabPage1.Controls.Add(this.label25);
+            this.tabPage1.Controls.Add(this.comboBox4);
+            this.tabPage1.Controls.Add(this.numericUpDown1);
+            this.tabPage1.Controls.Add(this.label23);
+            this.tabPage1.Controls.Add(this.EraseTime);
             this.tabPage1.Controls.Add(this.label22);
-            this.tabPage1.Controls.Add(this.trackBar1);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.label15);
             this.tabPage1.Controls.Add(this.label13);
@@ -167,43 +185,154 @@ namespace ProgramatorNEC
             this.tabPage1.Text = "Device";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // checkBox3
+            // comboBox5
             // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Checked = true;
-            this.checkBox3.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox3.Location = new System.Drawing.Point(318, 95);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(139, 21);
-            this.checkBox3.TabIndex = 106;
-            this.checkBox3.Text = "Use prewrite cmd";
-            this.checkBox3.UseVisualStyleBackColor = true;
+            this.comboBox5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox5.FormattingEnabled = true;
+            this.comboBox5.Items.AddRange(new object[] {
+            "78k/0",
+            "78k/0s"});
+            this.comboBox5.Location = new System.Drawing.Point(329, 60);
+            this.comboBox5.Name = "comboBox5";
+            this.comboBox5.Size = new System.Drawing.Size(84, 24);
+            this.comboBox5.TabIndex = 120;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(326, 42);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(78, 17);
+            this.label24.TabIndex = 119;
+            this.label24.Text = "MCU family";
+            // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Location = new System.Drawing.Point(329, 205);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(152, 21);
+            this.checkBox4.TabIndex = 118;
+            this.checkBox4.Text = "Negotiate baudrate";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(419, 123);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(26, 17);
+            this.label27.TabIndex = 114;
+            this.label27.Text = "ms";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(419, 181);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(36, 17);
+            this.label26.TabIndex = 113;
+            this.label26.Text = "MHz";
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(419, 237);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(31, 17);
+            this.label25.TabIndex = 112;
+            this.label25.Text = "bps";
+            // 
+            // comboBox4
+            // 
+            this.comboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox4.FormattingEnabled = true;
+            this.comboBox4.Items.AddRange(new object[] {
+            "4800",
+            "19200",
+            "31250",
+            "38400",
+            "76800"});
+            this.comboBox4.Location = new System.Drawing.Point(329, 231);
+            this.comboBox4.Name = "comboBox4";
+            this.comboBox4.Size = new System.Drawing.Size(84, 24);
+            this.comboBox4.TabIndex = 111;
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Increment = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Location = new System.Drawing.Point(329, 176);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            20000,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(84, 22);
+            this.numericUpDown1.TabIndex = 109;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(326, 151);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(81, 17);
+            this.label23.TabIndex = 108;
+            this.label23.Text = "Crystal/CLK";
+            // 
+            // EraseTime
+            // 
+            this.EraseTime.Increment = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.EraseTime.Location = new System.Drawing.Point(329, 118);
+            this.EraseTime.Maximum = new decimal(new int[] {
+            20000,
+            0,
+            0,
+            0});
+            this.EraseTime.Minimum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.EraseTime.Name = "EraseTime";
+            this.EraseTime.Size = new System.Drawing.Size(84, 22);
+            this.EraseTime.TabIndex = 107;
+            this.EraseTime.Value = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
             // 
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(315, 12);
+            this.label22.Location = new System.Drawing.Point(326, 98);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(146, 17);
+            this.label22.Size = new System.Drawing.Size(76, 17);
             this.label22.TabIndex = 105;
-            this.label22.Text = "EraseTime = 5000 ms";
-            // 
-            // trackBar1
-            // 
-            this.trackBar1.LargeChange = 100;
-            this.trackBar1.Location = new System.Drawing.Point(315, 32);
-            this.trackBar1.Maximum = 20000;
-            this.trackBar1.Minimum = 200;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(216, 56);
-            this.trackBar1.TabIndex = 104;
-            this.trackBar1.TickFrequency = 100;
-            this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
-            this.trackBar1.Value = 5000;
-            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
+            this.label22.Text = "EraseTime";
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBox5);
             this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Controls.Add(this.label21);
             this.groupBox1.Controls.Add(this.label20);
@@ -226,6 +355,18 @@ namespace ProgramatorNEC
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "ROM MAP";
             // 
+            // checkBox5
+            // 
+            this.checkBox5.AutoSize = true;
+            this.checkBox5.Checked = true;
+            this.checkBox5.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox5.Location = new System.Drawing.Point(197, 156);
+            this.checkBox5.Name = "checkBox5";
+            this.checkBox5.Size = new System.Drawing.Size(81, 21);
+            this.checkBox5.TabIndex = 118;
+            this.checkBox5.Text = "Grey FF";
+            this.checkBox5.UseVisualStyleBackColor = true;
+            // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
@@ -233,9 +374,9 @@ namespace ProgramatorNEC
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Location = new System.Drawing.Point(9, 156);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(159, 21);
+            this.checkBox1.Size = new System.Drawing.Size(179, 21);
             this.checkBox1.TabIndex = 117;
-            this.checkBox1.Text = "Koloruj bloki pamięci";
+            this.checkBox1.Text = "Colorize memory blocks";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // label21
@@ -381,7 +522,7 @@ namespace ProgramatorNEC
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(675, 203);
+            this.label15.Location = new System.Drawing.Point(657, 238);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(240, 17);
             this.label15.TabIndex = 96;
@@ -472,11 +613,11 @@ namespace ProgramatorNEC
             // 
             this.button3.BackColor = System.Drawing.Color.Lime;
             this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(6, 261);
+            this.button3.Location = new System.Drawing.Point(11, 261);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 30);
+            this.button3.Size = new System.Drawing.Size(298, 30);
             this.button3.TabIndex = 80;
-            this.button3.Text = "Czytaj";
+            this.button3.Text = "Read";
             this.button3.UseVisualStyleBackColor = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -548,9 +689,9 @@ namespace ProgramatorNEC
             // pictureBox2
             // 
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBox2.Location = new System.Drawing.Point(554, 6);
+            this.pictureBox2.Location = new System.Drawing.Point(505, 6);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(431, 392);
+            this.pictureBox2.Size = new System.Drawing.Size(480, 481);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox2.TabIndex = 92;
             this.pictureBox2.TabStop = false;
@@ -558,9 +699,15 @@ namespace ProgramatorNEC
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.button12);
+            this.tabPage2.Controls.Add(this.checkBox3);
             this.tabPage2.Controls.Add(this.progressBar1);
-            this.tabPage2.Controls.Add(this.panel1);
+            this.tabPage2.Controls.Add(this.button7);
+            this.tabPage2.Controls.Add(this.button8);
+            this.tabPage2.Controls.Add(this.button1);
+            this.tabPage2.Controls.Add(this.button6);
             this.tabPage2.Controls.Add(this.DGV);
+            this.tabPage2.Controls.Add(this.button5);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -569,6 +716,30 @@ namespace ProgramatorNEC
             this.tabPage2.Text = "Flash";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // button12
+            // 
+            this.button12.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button12.BackgroundImage")));
+            this.button12.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button12.Enabled = false;
+            this.button12.Location = new System.Drawing.Point(399, 3);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(75, 55);
+            this.button12.TabIndex = 108;
+            this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Checked = true;
+            this.checkBox3.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox3.Location = new System.Drawing.Point(870, 21);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(81, 21);
+            this.checkBox3.TabIndex = 107;
+            this.checkBox3.Text = "Prewrite";
+            this.checkBox3.UseVisualStyleBackColor = true;
+            // 
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(6, 468);
@@ -576,67 +747,49 @@ namespace ProgramatorNEC
             this.progressBar1.Size = new System.Drawing.Size(979, 23);
             this.progressBar1.TabIndex = 4;
             // 
-            // panel1
+            // button7
             // 
-            this.panel1.Controls.Add(this.button8);
-            this.panel1.Controls.Add(this.button1);
-            this.panel1.Controls.Add(this.button7);
-            this.panel1.Controls.Add(this.button6);
-            this.panel1.Controls.Add(this.button5);
-            this.panel1.Location = new System.Drawing.Point(6, 6);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(979, 37);
-            this.panel1.TabIndex = 98;
+            this.button7.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button7.BackgroundImage")));
+            this.button7.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button7.Location = new System.Drawing.Point(492, 3);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(75, 55);
+            this.button7.TabIndex = 2;
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(256, 3);
+            this.button8.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button8.BackgroundImage")));
+            this.button8.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button8.Location = new System.Drawing.Point(307, 3);
             this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(95, 31);
+            this.button8.Size = new System.Drawing.Size(75, 55);
             this.button8.TabIndex = 3;
-            this.button8.Text = "BLANK?";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(13, 4);
+            this.button1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button1.BackgroundImage")));
+            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button1.Location = new System.Drawing.Point(28, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 30);
+            this.button1.Size = new System.Drawing.Size(75, 55);
             this.button1.TabIndex = 1;
-            this.button1.Text = "LOAD";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button7
-            // 
-            this.button7.Location = new System.Drawing.Point(357, 3);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(95, 31);
-            this.button7.TabIndex = 2;
-            this.button7.Text = "PROG";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(175, 3);
+            this.button6.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button6.BackgroundImage")));
+            this.button6.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button6.Location = new System.Drawing.Point(213, 3);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(75, 31);
+            this.button6.Size = new System.Drawing.Size(75, 55);
             this.button6.TabIndex = 1;
-            this.button6.Text = "VERYFI";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(94, 3);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 31);
-            this.button5.TabIndex = 0;
-            this.button5.Text = "ERASE";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // DGV
             // 
@@ -645,29 +798,29 @@ namespace ProgramatorNEC
             this.DGV.AllowUserToOrderColumns = true;
             this.DGV.AllowUserToResizeColumns = false;
             this.DGV.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.DGV.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.DGV.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle10;
             this.DGV.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.DGV.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.DGV.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.DGV.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
             this.DGV.ColumnHeadersHeight = 20;
             this.DGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.DGV.DefaultCellStyle = dataGridViewCellStyle3;
-            this.DGV.Location = new System.Drawing.Point(6, 49);
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.DGV.DefaultCellStyle = dataGridViewCellStyle12;
+            this.DGV.Location = new System.Drawing.Point(6, 64);
             this.DGV.MultiSelect = false;
             this.DGV.Name = "DGV";
             this.DGV.ReadOnly = true;
@@ -680,8 +833,19 @@ namespace ProgramatorNEC
             this.DGV.ShowCellToolTips = false;
             this.DGV.ShowEditingIcon = false;
             this.DGV.ShowRowErrors = false;
-            this.DGV.Size = new System.Drawing.Size(979, 413);
+            this.DGV.Size = new System.Drawing.Size(979, 398);
             this.DGV.TabIndex = 0;
+            // 
+            // button5
+            // 
+            this.button5.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button5.BackgroundImage")));
+            this.button5.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button5.Location = new System.Drawing.Point(121, 3);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 55);
+            this.button5.TabIndex = 0;
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // tabPage3
             // 
@@ -712,17 +876,18 @@ namespace ProgramatorNEC
             // pictureBox3
             // 
             this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pictureBox3.Location = new System.Drawing.Point(495, 105);
+            this.pictureBox3.Location = new System.Drawing.Point(642, 5);
             this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(100, 106);
+            this.pictureBox3.Size = new System.Drawing.Size(345, 221);
             this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox3.TabIndex = 110;
             this.pictureBox3.TabStop = false;
+            this.pictureBox3.DoubleClick += new System.EventHandler(this.pictureBox3_DoubleClick);
             // 
             // button11
             // 
             this.button11.Enabled = false;
-            this.button11.Location = new System.Drawing.Point(239, 178);
+            this.button11.Location = new System.Drawing.Point(450, 161);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(114, 28);
             this.button11.TabIndex = 109;
@@ -737,14 +902,14 @@ namespace ProgramatorNEC
             this.groupBox2.Controls.Add(this.checkBox2);
             this.groupBox2.Location = new System.Drawing.Point(9, 231);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(199, 223);
+            this.groupBox2.Size = new System.Drawing.Size(344, 223);
             this.groupBox2.TabIndex = 108;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Programator - sterowanie";
+            this.groupBox2.Text = "PCB - control";
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(6, 139);
+            this.button10.Location = new System.Drawing.Point(230, 168);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(92, 23);
             this.button10.TabIndex = 3;
@@ -766,21 +931,21 @@ namespace ProgramatorNEC
             // 
             this.checkBox2.AutoSize = true;
             this.checkBox2.BackColor = System.Drawing.Color.Yellow;
-            this.checkBox2.Location = new System.Drawing.Point(6, 30);
+            this.checkBox2.Location = new System.Drawing.Point(6, 21);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(146, 21);
+            this.checkBox2.Size = new System.Drawing.Size(104, 21);
             this.checkBox2.TabIndex = 0;
-            this.checkBox2.Text = "Włącz zasilanie 5v";
+            this.checkBox2.Text = "Turn ON 5v";
             this.checkBox2.UseVisualStyleBackColor = false;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(239, 128);
+            this.button2.Location = new System.Drawing.Point(450, 105);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(114, 28);
             this.button2.TabIndex = 107;
-            this.button2.Text = "POŁĄCZ";
+            this.button2.Text = "CONNECT";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click_1);
             // 
@@ -832,7 +997,7 @@ namespace ProgramatorNEC
             this.textBox11.Location = new System.Drawing.Point(124, 184);
             this.textBox11.Name = "textBox11";
             this.textBox11.ReadOnly = true;
-            this.textBox11.Size = new System.Drawing.Size(100, 22);
+            this.textBox11.Size = new System.Drawing.Size(312, 22);
             this.textBox11.TabIndex = 103;
             this.textBox11.Text = "1 bit";
             // 
@@ -841,7 +1006,7 @@ namespace ProgramatorNEC
             this.textBox10.Location = new System.Drawing.Point(124, 156);
             this.textBox10.Name = "textBox10";
             this.textBox10.ReadOnly = true;
-            this.textBox10.Size = new System.Drawing.Size(100, 22);
+            this.textBox10.Size = new System.Drawing.Size(312, 22);
             this.textBox10.TabIndex = 101;
             this.textBox10.Text = "8 bits";
             // 
@@ -850,7 +1015,7 @@ namespace ProgramatorNEC
             this.textBox9.Location = new System.Drawing.Point(124, 128);
             this.textBox9.Name = "textBox9";
             this.textBox9.ReadOnly = true;
-            this.textBox9.Size = new System.Drawing.Size(100, 22);
+            this.textBox9.Size = new System.Drawing.Size(312, 22);
             this.textBox9.TabIndex = 99;
             this.textBox9.Text = "None";
             // 
@@ -859,7 +1024,7 @@ namespace ProgramatorNEC
             this.textBox8.Location = new System.Drawing.Point(124, 100);
             this.textBox8.Name = "textBox8";
             this.textBox8.ReadOnly = true;
-            this.textBox8.Size = new System.Drawing.Size(100, 22);
+            this.textBox8.Size = new System.Drawing.Size(312, 22);
             this.textBox8.TabIndex = 97;
             this.textBox8.Text = "9600";
             // 
@@ -988,6 +1153,7 @@ namespace ProgramatorNEC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Navy;
             this.ClientSize = new System.Drawing.Size(1005, 669);
             this.Controls.Add(this.Xconsole);
             this.Controls.Add(this.tabControl1);
@@ -1001,12 +1167,13 @@ namespace ProgramatorNEC
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.EraseTime)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.tabPage2.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DGV)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
@@ -1066,7 +1233,6 @@ namespace ProgramatorNEC
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.DataGridView DGV;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button5;
@@ -1095,9 +1261,20 @@ namespace ProgramatorNEC
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.Button button11;
         private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.TrackBar trackBar1;
-        private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.NumericUpDown EraseTime;
+        private System.Windows.Forms.ComboBox comboBox4;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.CheckBox checkBox4;
+        private System.Windows.Forms.CheckBox checkBox5;
+        private System.Windows.Forms.ComboBox comboBox5;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.Button button12;
     }
 }
 
