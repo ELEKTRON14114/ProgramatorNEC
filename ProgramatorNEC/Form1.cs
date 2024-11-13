@@ -318,28 +318,46 @@ namespace ProgramatorNEC
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if(MCU_FlashSize ==0)
+            if (MCU_FlashSize == 0)
             {
                 MessageBox.Show("Nieznany rozmiar pamięci. Odcyztaj sygnaturę!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            if (openFileDialog1.ShowDialog() != DialogResult.OK | openFileDialog1.FileName == "")
+            string fileName = openFileDialog1.FileName;
+
+            if (openFileDialog1.ShowDialog() != DialogResult.OK | fileName == "")
                 return;
 
-            //////////////////////TWORZENIE TABELI NA WYMIAR//////////////////
-            CreateMemoTable(MCU_FlashSize);
-
             ///załadowanie pliku do komórek
-            LoadBINFile(openFileDialog1.FileName, MCU_FlashSize);
+
+            bool Result = false;
+
+            if (fileName.EndsWith(".bin"))
+            {
+                Result = LoadBINFile(fileName, MCU_FlashSize);
+            }
+            else if (fileName.EndsWith(".hex"))
+            {
+                Result = LoadHexFile(fileName, MCU_FlashSize);
+            }
+            if(Result) {
+                //////////////////////TWORZENIE TABELI NA WYMIAR//////////////////
+                CreateMemoTable(MCU_FlashSize);
+            }
         }
 
 
-        void LoadBINFile(String filePath, int OstatniAdres)
+        bool LoadBINFile(String filePath, int OstatniAdres)
         {
             Array.Clear(Buffor, 0, Buffor.Length); //wyczyść bufor przed wczytaniem
             Buffor = File.ReadAllBytes(filePath); //załaduj bufor zawartością pliku
-            FileStream s2 = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None); //blokowanie pliku przed nadpisaniem
+            if (Buffor.Length > OstatniAdres) {
+                MessageBox.Show("Za dyży plik!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return false;
+            }
+            return true;
+           /* FileStream s2 = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None); //blokowanie pliku przed nadpisaniem
            
             for (int y = 0; y < (0x3FFF / 16) + 1; y++) //OstatniAdres
                 for (int x = 0; x < 16; x++)
@@ -360,12 +378,29 @@ namespace ProgramatorNEC
                         DGV[x, y].Value = "FF"; //wypełnij puste miejsca FFami
                         DGV[16, y].Value += ".";
                     }
-                }
+                }*/
         }
 
-        void LoadHexFile(String filePath)
+        bool LoadHexFile(String filePath, int flashSize)
         {
-
+            Buffor = new byte[flashSize];
+            IntelHex hex = IntelHex.LoadIntelHex(filePath);
+            if (!hex.calcCRC()) {
+                MessageBox.Show("Błąd CRC!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return false;
+            }
+            foreach (IntelHex.Entry entry in hex.Entries)
+            {
+                for (int i = 0; i < entry.data_size; i++)
+                {
+                    int address = entry.address + i;
+                    if (address >= Buffor.Length) {
+                        continue;
+                    }
+                    Buffor[address] = entry.data[i];
+                }
+            }
+            return true;
         }
 
         private void button8_Click(object sender, EventArgs e)
@@ -415,26 +450,46 @@ namespace ProgramatorNEC
                 DGV.Rows[rows].HeaderCell.Value = "0000-" + (rows * 16).ToString("X4") + ":";
             }
 
+            int Start1 = int.Parse(textBox14.Text, System.Globalization.NumberStyles.HexNumber);
+            int End1 = int.Parse(textBox17.Text, System.Globalization.NumberStyles.HexNumber);
+
+            int Start2 = int.Parse(textBox13.Text, System.Globalization.NumberStyles.HexNumber);
+            int End2 = int.Parse(textBox16.Text, System.Globalization.NumberStyles.HexNumber);
+
+            int Start3 = int.Parse(textBox12.Text, System.Globalization.NumberStyles.HexNumber);
+            int End3 = int.Parse(textBox15.Text, System.Globalization.NumberStyles.HexNumber);
+
+            int Start4 = int.Parse(textBox19.Text, System.Globalization.NumberStyles.HexNumber);
+            int End4 = int.Parse(textBox18.Text, System.Globalization.NumberStyles.HexNumber);
+
             /////kolorowanie bloków
-            if (checkBox1.Checked)
-                try
+            try
+            {
+
+                for (int y = 0; y < (LastAdres / 16) + 1; y++)
                 {
+                    char[] asciiRow = new char[16];
 
-                    for (int y = 0; y < (LastAdres / 16) + 1; y++)
-                        for (int x = 0; x < 16; x++)
+                    for (int x = 0; x < 16; x++)
+                    {
+                        int AdresKomorki = x + (y * 16);
+
+                        byte bufforData = (AdresKomorki >= Buffor.Length) ? (byte)0xFF : Buffor[AdresKomorki];
+
+                        DGV[x, y].Value = bufforData.ToString("X2");
+
+                        if (bufforData > 32 & bufforData < 127)
                         {
-                            int AdresKomorki = x + (y * 16);
-                            int Start1 = int.Parse(textBox14.Text, System.Globalization.NumberStyles.HexNumber);
-                            int End1 = int.Parse(textBox17.Text, System.Globalization.NumberStyles.HexNumber);
+                            asciiRow[x] = (char)bufforData;
+                        }
+                        else {
+                            asciiRow[x] = '.';
+                        }
 
-                            int Start2 = int.Parse(textBox13.Text, System.Globalization.NumberStyles.HexNumber);
-                            int End2 = int.Parse(textBox16.Text, System.Globalization.NumberStyles.HexNumber);
 
-                            int Start3 = int.Parse(textBox12.Text, System.Globalization.NumberStyles.HexNumber);
-                            int End3 = int.Parse(textBox15.Text, System.Globalization.NumberStyles.HexNumber);
-
-                            int Start4 = int.Parse(textBox19.Text, System.Globalization.NumberStyles.HexNumber);
-                            int End4 = int.Parse(textBox18.Text, System.Globalization.NumberStyles.HexNumber);
+                        if (checkBox1.Checked)
+                        {
+                            DGV[x, y].Style.ForeColor = (bufforData == 0xFF && checkBox5.Checked) ? Color.LightGray : Color.Black;
 
                             if (AdresKomorki >= Start1 & AdresKomorki <= End1)
                             {
@@ -453,11 +508,15 @@ namespace ProgramatorNEC
                                 DGV[x, y].Style.BackColor = textBox19.BackColor;
                             }
                         }
-                }
-                catch
-                {
+                    }
 
+                    DGV[16, y].Value = new String(asciiRow);
                 }
+            }
+            catch
+            {
+
+            }
         }
 
         private void button5_Click(object sender, EventArgs e)
